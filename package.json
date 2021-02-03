@@ -1,0 +1,14 @@
+{
+  "name": "api_market",
+  "version": "1.0.0",
+  "description": "Api to search through specifications and price products ",
+  "main": "search.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gabriel Aragao",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.6.4"
+  }
+}
