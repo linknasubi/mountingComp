@@ -1,5 +1,4 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
 const app = express();
 const port = 3000;
 
@@ -12,7 +11,7 @@ app.get('/search-market', (req, res) => {
 
     if(searchQuery != null){
 
-        searchMercado(searchQuery)
+        searchMercado()
         .then(results => {
             res.status(200);
             res.json(results);
