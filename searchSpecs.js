@@ -3,7 +3,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-
+const insertValues = require('./models/processor.js');
 
 async function searchSpecs(specs){
 
@@ -64,18 +64,21 @@ async function searchSpecs(specs){
         dataAux = {};
         
       };
+
+      data = Object.assign({}, data);
       
+
+
       return data;
      
     }, specs);
     
-    
-    console.log(result);
 
+    //console.log(result);
 
     await browser.close();
 
-    return result;
+    return await result;
 };
 
 
@@ -85,19 +88,30 @@ class Component  {
 
     this.filePath = filePath;
     
-    this.searchJson();
+
+    this.initializer();
+
 
   };
 
-  searchJson(){
+
+  async initializer(){
+
+    insertValues( await this.searchJson() );
+
+  }
+
+  async searchJson(){
 
     let proc_json = JSON.parse( fs.readFileSync(this.filePath, 'utf8') );
 
-    searchSpecs(proc_json);
+    let values = await searchSpecs(proc_json);
+
+    return values;
 
   };
 
-};
+}
 
 
 Processor = new Component('./jsons/processors.json');

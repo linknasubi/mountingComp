@@ -91,4 +91,4 @@ const searchMercado = async(searchQuery) => {
 
 module.exports = searchMercado;
 
-searchMercado('computador gamer');
+//searchMercado('computador gamer');

@@ -2,23 +2,37 @@ const MongoClient = require('mongodb').MongoClient;
 
 const url = "mongodb://127.0.0.1:27017";
 
-MongoClient.connect(url, (err, db) => {
 
-    if(err) throw err;
-
-    var dbo = db.db('mydb');
-
-    var obj = {name:'i5', preco:'1000'};
-
-    dbo.collection('Processors').insertOne(obj, (err, res) => {
-
-
+const Insertion = (json) => {MongoClient.connect(url, (err, db) => {
+ 
         if(err) throw err;
 
+        var dbo = db.db('mydb');
+        
 
 
-    });
+        dbo.collection('Processors').insertOne(json, (err, res) => {
+         if(err) throw err;
+
+         console.log('Successful');
+    
+
+     });
 
 
-    db.close();
-});
+    // dbo.collection("Processors").findOne({}, function(err, result) {
+    //     if (err) throw err;
+    //     console.log(result['name']);
+    //     db.close();
+    //   });
+
+         db.close();
+     })
+    }
+
+
+
+
+
+module.exports = Insertion;
+
