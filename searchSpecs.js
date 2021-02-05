@@ -1,13 +1,14 @@
 //https://www.intel.com/content/www/us/en/products/processors/core/view-all.html?page=1
 
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
-const Specs = { title: ['div.ui-search-result__wrapper > div.andes-card > a', 'title'],
+const proc_json = JSON.parse(fs.readFileSync('./jsons/processors.json', 'utf8'));
 
-          url: ['div.ui-search-result__wrapper > div.andes-card > a', 'href'],
 
-          price: ['div.ui-search-result__wrapper > div.andes-card > a > div.ui-search-result__content-wrapper > \
-          div.ui-search-item__group > div.ui-search-price > div.ui-search-price__second-line > span.price-tag > span.price-tag-fraction', 'innerText']  };
+
+
+
 
 async function searchSpecs(specs){
 
@@ -19,6 +20,7 @@ async function searchSpecs(specs){
     await page.setRequestInterception(true);
 
     //if the page makes a  request to a resource type of image then abort that request
+
     page.on('request', request => {
       if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet')
         request.abort();
@@ -73,7 +75,6 @@ async function searchSpecs(specs){
     }, specs);
     
     
-    
     console.log(result);
 
 
@@ -82,7 +83,7 @@ async function searchSpecs(specs){
     return result;
 };
 
-searchSpecs(Specs);
+searchSpecs(proc_json);
 
 
 //module.exports = searchSpecs;
