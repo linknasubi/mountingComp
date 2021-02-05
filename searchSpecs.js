@@ -3,11 +3,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-const proc_json = JSON.parse(fs.readFileSync('./jsons/processors.json', 'utf8'));
-
-
-
-
 
 
 async function searchSpecs(specs){
@@ -83,7 +78,31 @@ async function searchSpecs(specs){
     return result;
 };
 
-searchSpecs(proc_json);
+
+class Component  {
+
+  constructor(filePath){
+
+    this.filePath = filePath;
+    
+    this.searchJson();
+
+  };
+
+  searchJson(){
+
+    let proc_json = JSON.parse( fs.readFileSync(this.filePath, 'utf8') );
+
+    searchSpecs(proc_json);
+
+  };
+
+};
+
+
+Processor = new Component('./jsons/processors.json');
+
+
 
 
 //module.exports = searchSpecs;
