@@ -1,0 +1,8 @@
+{ 
+        "title": ["div.ui-search-result__wrapper > div.andes-card > a", "title"],
+
+        "url": ["div.ui-search-result__wrapper > div.andes-card > a", "href"],
+
+        "price": ["div.ui-search-result__wrapper > div.andes-card > a > div.ui-search-result__content-wrapper > div.ui-search-item__group > div.ui-search-price > div.ui-search-price__second-line > span.price-tag > span.price-tag-fraction", "innerText"]
+
+}
