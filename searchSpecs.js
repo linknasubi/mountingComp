@@ -5,6 +5,9 @@ const fs = require('fs');
 
 const insertValues = require('./models/processor.js');
 
+const Utils = require('./helpers/helper.js');
+
+
 async function searchSpecs(specs){
 
     
@@ -26,14 +29,17 @@ async function searchSpecs(specs){
     searchQuery = 'computador'; 
 
 
-    await page.goto('https://lista.mercadolivre.com.br/'+ searchQuery.replace("-", " ") + "#D" + "[" + searchQuery.replace("%20", " ") + "]");
+    await page.goto(specs['mainUrl']);
 
 
 
-    await page.waitForSelector('li.ui-search-layout__item');
+    await page.waitForSelector(specs['waitFor']);
+
 
     
-    const result = await page.evaluate((argSpecs) => { 
+
+    
+    const result = await page.evaluate((argSpecs) => { //Query and filtering data
       
       
       let dataAux = {};
@@ -73,8 +79,6 @@ async function searchSpecs(specs){
      
     }, specs);
     
-
-    //console.log(result);
 
     await browser.close();
 

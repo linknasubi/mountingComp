@@ -1,5 +1,11 @@
 { 
-        "title": ["div.ui-search-result__wrapper > div.andes-card > a", "title"],
+
+        "waitFor":"div#dynamic-product-card-template",
+        "elemAll": "div.card-item",
+        "mainUrl": "https://www.intel.com/content/www/us/en/products/processors/core/view-all.html",
+
+
+        "processor": ["div.item-wrap1 > div.item-wrap2 > div.content-main > div.content-wrap > h3.title > a > span.prodNameTitle"],
 
         "url": ["div.ui-search-result__wrapper > div.andes-card > a", "href"],
 
