@@ -15,7 +15,6 @@ async function searchSpecs(specs){
   const browser = await puppeteer.launch({headless:true});
   const page = await browser.newPage();
 
-  await page.exposeFunction("separObjects", Utils.separObjects); //Used to acess the function inside page.evaluate
 
     await page.setRequestInterception(true);
 
@@ -28,40 +27,49 @@ async function searchSpecs(specs){
         request.continue();
     });
 
+    searchQuery = 'computador'; 
+
 
     await page.goto(specs['mainUrl']);
+
+
+
     await page.waitForSelector(specs['waitFor']);
     
-    const views = await page.evaluate((argSpecs) => { //Query and filtering data
+    const result = await page.evaluate((argSpecs) => { //Query and filtering data
+      
+      
+      const separObjects = (obj, f_index, l_index) =>{
 
-      var views = document.querySelectorAll(argSpecs['elemAll']);
-
-      views = Object.assign([], views);
-       
-      return views;
-     
-    }, specs);
-
-
-    const queryingValues = () =>{
-
-      const specs_new = Utils.separObjects(specs, 3);
-
+        const new_obj = {}
+    
+        Object.keys(obj).slice(f_index, l_index).forEach( (value, key) => { //Creating a new object with some elements from the previous object that is refered to
+            new_obj[value] = obj[value];
+          });
+    
+        
+        return new_obj
+    
+    
+    }
+    
       let dataAux = {};
       let data = [];
+
+      var views = document.querySelectorAll(argSpecs['elemAll']);
+      
+      var specs_new = separObjects(argSpecs, 3);
 
       
       for(var view of views){
         
-        view = view[Object.keys(view)[0] ]
-        console.log(view);
-        
         for(var spec in specs_new){ //ESSE FOR NÃO TA FUNCIONANDO QUANDO COLOCO O SPECS_NEW
           
-          var value =  view.querySelector(specs_new[spec][0]) ;
+          var value = view.querySelector(argSpecs[spec][0]) ;
+          
           
           if(value != null ){
-             value = value[ specs_new[spec][1] ];
+             value = value[ argSpecs[spec][1] ];
             }
             else { value = "Not found";  }
           
@@ -74,16 +82,19 @@ async function searchSpecs(specs){
       };
 
       data = Object.assign({}, data);
+      
 
 
       return data;
-    }
+     
+    }, specs);
     
-    console.log(queryingValues())
+    
+    console.log(result)
 
     await browser.close();
 
-    return await queryingValues;
+    return await result;
 };
 
 
