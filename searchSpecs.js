@@ -5,12 +5,16 @@ const fs = require('fs');
 
 const insertValues = require('./models/processor.js');
 
+const Utils = require('./helpers/helper.js');
+
+
 async function searchSpecs(specs){
+  
+  
+  
+  const browser = await puppeteer.launch({headless:true});
+  const page = await browser.newPage();
 
-    
-
-    const browser = await puppeteer.launch({headless:true});
-    const page = await browser.newPage();
 
     await page.setRequestInterception(true);
 
@@ -26,34 +30,46 @@ async function searchSpecs(specs){
     searchQuery = 'computador'; 
 
 
-    await page.goto('https://lista.mercadolivre.com.br/'+ searchQuery.replace("-", " ") + "#D" + "[" + searchQuery.replace("%20", " ") + "]");
+    await page.goto(specs['mainUrl']);
 
 
 
-    await page.waitForSelector('li.ui-search-layout__item');
-
+    await page.waitForSelector(specs['waitFor']);
     
-    const result = await page.evaluate((argSpecs) => { 
+    const result = await page.evaluate((argSpecs) => { //Query and filtering data
       
       
+      const separObjects = (obj, f_index, l_index) =>{
+
+        const new_obj = {}
+    
+        Object.keys(obj).slice(f_index, l_index).forEach( (value, key) => { //Creating a new object with some elements from the previous object that is refered to
+            new_obj[value] = obj[value];
+          });
+    
+        
+        return new_obj
+    
+    
+    }
+    
       let dataAux = {};
       let data = [];
 
-      var views = document.querySelectorAll('li.ui-search-layout__item');
-      let counter = 0;
+      var views = document.querySelectorAll(argSpecs['elemAll']);
+      
+      var specs_new = separObjects(argSpecs, 3);
+
       
       for(var view of views){
         
-        for(var spec in argSpecs){
+        for(var spec in specs_new){ //ESSE FOR NÃO TA FUNCIONANDO QUANDO COLOCO O SPECS_NEW
           
-          
-          var value =  view.querySelector(argSpecs[spec][0]) ;
+          var value = view.querySelector(argSpecs[spec][0]) ;
           
           
           if(value != null ){
-             value = value[argSpecs[spec][1]];
-
-
+             value = value[ argSpecs[spec][1] ];
             }
             else { value = "Not found";  }
           
@@ -73,8 +89,8 @@ async function searchSpecs(specs){
      
     }, specs);
     
-
-    //console.log(result);
+    
+    console.log(result)
 
     await browser.close();
 
@@ -106,6 +122,8 @@ class Component  {
     let proc_json = JSON.parse( fs.readFileSync(this.filePath, 'utf8') );
 
     let values = await searchSpecs(proc_json);
+
+    
 
     return values;
 
