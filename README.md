@@ -5,3 +5,4 @@
 * EJS - 3.1.5
 * Express - 4.17.1
 * MongoDB - 3.6.4
+* node-xlsx - 0.16.1
