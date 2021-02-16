@@ -9,6 +9,7 @@
   "author": "Gabriel Aragao",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^3.6.4"
+    "mongodb": "^3.6.4",
+    "node-xlsx": "^0.16.1"
   }
 }
