@@ -25,31 +25,45 @@ class Excel{
     constructor(data){
 
         this._data = xlsx.parse(data);
+        this.parsedData = []
 
     }
 
+
+    /**
+     * @param {number} table Table index.
+     * @returns {object} Returns the value parsed by xlsx.
+     */
+
+    readingFile(table){
+
+        this.parsedData = this.separateComma(table); 
+
+        return this.parsedData;
+    }
+
+    /**
+     * 
+     * @param {number} table Table index.
+     * 
+     * @returns {object} Returns the data object separated by its commas.
+     * 
+     */
+
     separateComma(table){
-        commaData = this.data;
 
-        for( let row of commaData[table]['data'] ){
-
-            commaData[table]['data'] = row.split(',');
+        var commaData = [...this._data][table];
+        
+        for( let row = 0; row < commaData['data'].length; row++ ){
+            
+            commaData['data'][row] = commaData['data'][row][0].split(',');
 
         }
 
         return commaData;
     }
 
-    /**
-     * Returns the value parsed by xlsx and changes parsedData property.
-     */
 
-    readingFile(){
-
-        this.parsedData = xlsx.parse(this.data);
-
-        return xlsx.parse(this.data);
-    }
 
 
     /** 
@@ -62,8 +76,7 @@ class Excel{
 
     queryResult(table, row, column){
         
-        let parsedData = readingFile();
-        let parsedData = parsedData[table]['data'][row].split(',');
+        let parsedData = [...this.parsedData];
 
         return parsedData[table]['data'][row][column];
     }
@@ -77,17 +90,15 @@ class Excel{
      */
 
 
-    fetchValues(table, arr){ 
+    fetchValues(arr){ 
 
-
-        var parsedData = this.readingFile();
+        var parsedData = {...this.parsedData}['data'];
         var obj = {};
 
         for(let i of arr){
+            
+            let val = parsedData[0].indexOf(i);
 
-            let val = parsedData[table]['data'][0].indexOf(i);
-            console.log(i)
-            console.log(parsedData[table]['data'][0])
 
             if(val != -1){
                 obj[i] = val;
@@ -101,37 +112,22 @@ class Excel{
 
     }
 
-
-
-}
-
-
-class Processors extends Excel{
-
-    constructor(data){
-        super(data);
-        this.table_1 = this.readingFile()[0]['data'];
-    }
-
-
     /**
      * @param {array} search_arr Columns to be searched in the parsed data.
      * @returns {array} Strings to be queried.
-     */
+    */
 
     computeString(search_arr){
 
         var string = '';
         var str_arr = [];
 
-        var columns = this.fetchValues(0, search_arr);
+        var columns = this.fetchValues(search_arr);
 
-        console.log(columns)
-        
-        for(let i = 1; i < this.table_1.length; i++){
+        for(let i = 1; i < this.parsedData['data'].length; i++){
             for( let j of Object.values(columns) ){
 
-                string += this.table_1[i][j]
+                string += this.parsedData['data'][i][j] + ' '
     
             }
             
@@ -145,12 +141,74 @@ class Processors extends Excel{
 
 
 
+}
+
+
+class Processors extends Excel{
+
+    /**
+     * 
+     * @param {string} data Path to be readed. 
+     * @param {number} table Table index.
+     */
+
+    constructor(data, table){
+        super(data);
+        this.table = this.readingFile(table)['data'];
+    }
+
+    /**
+     * 
+     * @param {array} search_arr String array to query values in the parsed data column.
+     * 
+     * @returns {array} Array with all values to be queried.
+     */
+
+    queryValues(search_arr){
+
+        return this.computeString(search_arr);
+
+    }
 
 
 }
 
 
-const proc = new Processors('../assets/css/example.xlsx');
+class Graphics extends Excel{
 
-console.log(proc.computeString(['Brand', 'Model']))
+    /**
+     * 
+     * @param {string} data Path to be readed. 
+     * @param {number} table Table index.
+     */
+
+    constructor(data, table){
+        super(data);
+        this.table = this.readingFile(table)['data'];
+    }
+
+    /**
+     * 
+     * @param {array} search_arr String array to query values in the parsed data column.
+     * 
+     * @returns {array} Array with all values to be queried.
+     */
+
+    queryValues(search_arr){
+
+        return this.computeString(search_arr);
+
+    }
+
+
+}
+
+
+
+const proc = new Processors('../assets/css/cpu.xlsx', 0).queryValues(['Brand', 'Model']);
+const grap = new Graphics('../assets/css/gpu.xlsx', 0).queryValues(['Brand', 'Model']);
+
+
+console.log(grap);
+
 
