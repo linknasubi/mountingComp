@@ -24,4 +24,8 @@ function testing(num_a, num_b) {
 }
 
 
-console.log(testing(sum_a, sum_b))
+obj = {'a':1, 'b':2}
+
+for(let i in obj){
+    console.log(i)
+}

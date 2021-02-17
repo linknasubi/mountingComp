@@ -3,9 +3,9 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-const insertValues = require('./models/processor.js');
+const insertValues = require('../models/processor.js');
 
-const Utils = require('./helpers/helper.js');
+const Utils = require('./helpers/helper.js.js');
 
 
 async function searchSpecs(specs){
@@ -63,7 +63,7 @@ async function searchSpecs(specs){
       
       for(var view of views){
         
-        for(var spec in specs_new){ //ESSE FOR NÃO TA FUNCIONANDO QUANDO COLOCO O SPECS_NEW
+        for(var spec in specs_new){ 
           
           var value = view.querySelector(argSpecs[spec][0]) ;
           
