@@ -1,214 +1,123 @@
-/*
-*
-*   Fazer a leitura, em seguida lidar com os dados e prepará-los para a busca no mercado livre, inicialmente
-*
-*
-*   Através da leitura de json já existente adaptar o código para tabelar os preços e talvez outras informações necessárias
-*
-*
-*   Adicionar todos valores ao banco de dados e lidar com as informações de forma adequada
-*
-*/
+
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+
+const insertValues = require('../models/processor.js');
+
+const Utils = require('../helpers/helper.js');
 
 
-xlsx = require('node-xlsx').default;
+function dataSearch(data_json, search_query){
 
+  let obj = {Utils}
+  
+  
+  const loadingData = async () =>{
 
-class Excel{
-
-    /**
-     * 
-     * @param {String} data Path to be readed.
-     *  
-     */
-
-    constructor(data){
-
-        this._data = xlsx.parse(data);
-        this.parsedData = []
-
-    }
-
-
-    /**
-     * @param {number} table Table index.
-     * @returns {object} Returns the value parsed by xlsx.
-     */
-
-    readingFile(table){
-
-        this.parsedData = this.separateComma(table); 
-
-        return this.parsedData;
-    }
-
-    /**
-     * 
-     * @param {number} table Table index.
-     * 
-     * @returns {object} Returns the data object separated by its commas.
-     * 
-     */
-
-    separateComma(table){
-
-        var commaData = [...this._data][table];
-        
-        for( let row = 0; row < commaData['data'].length; row++ ){
-            
-            commaData['data'][row] = commaData['data'][row][0].split(',');
-
-        }
-
-        return commaData;
-    }
-
-
-
-
-    /** 
-     * @param {number} table Table starts at 0. 
-     * @param {number} row Row starts at 1.
-     * @param {number} column Column starts at 0.
-     * 
-     * @returns {array} Returns the value specified by its indexes.
-    */
-
-    queryResult(table, row, column){
-        
-        let parsedData = [...this.parsedData];
-
-        return parsedData[table]['data'][row][column];
-    }
-
-    /**
-     * @param {array} arr Values to be searched inside the parsed data.
-     * @param {number} table Table starts at 0.
-     * 
-     * @returns {object} Returns indexes associated with its key values in the parsed data.
-     * 
-     */
-
-
-    fetchValues(arr){ 
-
-        var parsedData = {...this.parsedData}['data'];
-        var obj = {};
-
-        for(let i of arr){
-            
-            let val = parsedData[0].indexOf(i);
-
-
-            if(val != -1){
-                obj[i] = val;
-            }
-
-            else{ return NaN; }
-        
-        }
-
-        return obj
-
-    }
-
-    /**
-     * @param {array} search_arr Columns to be searched in the parsed data.
-     * @returns {array} Strings to be queried.
-    */
-
-    computeString(search_arr){
-
-        var string = '';
-        var str_arr = [];
-
-        var columns = this.fetchValues(search_arr);
-
-        for(let i = 1; i < this.parsedData['data'].length; i++){
-            for( let j of Object.values(columns) ){
-
-                string += this.parsedData['data'][i][j] + ' '
+    console.log('Starting to loading the data...');
     
-            }
-            
-            str_arr.push( string );
-            string = '';
-        }
 
-        return str_arr;
+    obj._browser = await puppeteer.launch({headless:true});
+    obj._page = await obj._browser.newPage();
+  
+  
+    await obj._page.setRequestInterception(true);
+    
+    obj._page.on('request', request => {
+      if (request.resourceType() === 'image' || request.resourceType() === 'stylesheet') //Aborts request to a resource of image or stylesheet type
+        request.abort();
+      else
+        request.continue();
+    });
 
-    }
+    obj.queries = await obj.Utils.jsonReader(data_json); //Parses the path to json and returns a object
+
+    await obj._page.goto(obj.queries['mainUrl']+ search_query.replace("-", " ") + "#D" + "[" + search_query.replace("%20", " ") + "]"); //Computes the string query and goes to page
+    await obj._page.waitForSelector(obj.queries['waitFor']); //Waits for the selector mentioned to be loaded
+
+    console.log('Page loaded!');
+    
+  }
+
+  const closingData = async () =>{
+
+    console.log('Closing the page...');
+
+    await obj._page.close();
+    await obj._browser.close();
+
+    console.log('Page closed!');
+
+  }
+  
+  obj.loadingData = loadingData;
+  obj.closingData = closingData;
+
+  const parsingData = async () =>{
+
+    
+    await obj.loadingData()
+    .then(
+      await setTimeout( ()=>{console.log('Querying the data...')}, 2000 )
+      )
+    .catch(err=>console.log(err));
+
+    
+    views = await obj._page.$$(obj.queries['elemAll']);
+
+    specs_new = obj.Utils.separObjects(obj.queries, 3);
+    
+
+    let dataAux = {};
+    let data = [];
 
 
+    for(var view in views){
+
+      for(var spec in specs_new){
+        
+        let element = await views[view].$(specs_new[spec][0]);
+
+        
+        if(element != null ){
+
+           element = await obj._page.evaluate((element, specs_new, spec) => element[ specs_new[spec][1] ], element, specs_new, spec);
+
+          }
+          else { element = "Not found";  }
+        
+        dataAux[spec] =  element;
+      };
+      
+      data.push(dataAux);
+      dataAux = {};
+
+      
+    };
+
+    obj.data = data;
+  }
+
+  obj.parsingData = parsingData;
+
+  
+  return obj
 
 }
 
+// (async () =>{
+//   const searched = dataSearch('../jsons/processors.json', 'Nvidia RTX 3090 ');
+//   parsed = await searched.parsingData();
+//   await searched.closingData();
 
-class Processors extends Excel{
-
-    /**
-     * 
-     * @param {string} data Path to be readed. 
-     * @param {number} table Table index.
-     */
-
-    constructor(data, table){
-        super(data);
-        this.table = this.readingFile(table)['data'];
-    }
-
-    /**
-     * 
-     * @param {array} search_arr String array to query values in the parsed data column.
-     * 
-     * @returns {array} Array with all values to be queried.
-     */
-
-    queryValues(search_arr){
-
-        return this.computeString(search_arr);
-
-    }
-
-
-}
-
-
-class Graphics extends Excel{
-
-    /**
-     * 
-     * @param {string} data Path to be readed. 
-     * @param {number} table Table index.
-     */
-
-    constructor(data, table){
-        super(data);
-        this.table = this.readingFile(table)['data'];
-    }
-
-    /**
-     * 
-     * @param {array} search_arr String array to query values in the parsed data column.
-     * 
-     * @returns {array} Array with all values to be queried.
-     */
-
-    queryValues(search_arr){
-
-        return this.computeString(search_arr);
-
-    }
-
-
-}
+//   console.log({queries:searched.queries, data:searched.data});
+// })();
 
 
 
-const proc = new Processors('../assets/csv/cpu.xlsx', 0).queryValues(['Brand', 'Model']);
-const grap = new Graphics('../assets/csv/gpu.xlsx', 0).queryValues(['Brand', 'Model']);
 
 
-console.log(grap);
 
 
+
+module.exports = {dataSearch};
