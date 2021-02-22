@@ -1,31 +1,32 @@
-function sum(a, b, callback){
-    let c = callback();
-    return a+b+c;
+obj = {}
 
-};
+async function sum (a,b) {
 
+    for(let i = 0; i<1000000000; i++){
+        
+    }
 
-function sub(a,b){
-    return a-b
-};
-
-var sum_a = 1;
-var sum_b = 2;
-
-
-function testing(num_a, num_b) {
-
-    var d = sum(num_a,num_b, ()=>{
-        return sub(num_a, num_b);
-    })
-
-    return d
-
+    obj.sum = a+b;
+    console.log('sum');
+    return a+b;
 }
 
+async function mult (c) {
 
-obj = {'a':1, 'b':2}
 
-for(let i in obj){
-    console.log(i)
+
+    obj.mult = c*2;
+    console.log(c);
+    return c * 2;
 }
+
+const prom = new Promise( (resolve, reject) =>{});
+
+prom
+.then(sum(1,2))
+.then(mult(obj.sum));
+
+
+console.log(obj)
+
+

@@ -9,6 +9,7 @@
   "author": "Gabriel Aragao",
   "license": "ISC",
   "dependencies": {
+    "fast-csv": "^4.3.6",
     "mongodb": "^3.6.4",
     "node-xlsx": "^0.16.1"
   }

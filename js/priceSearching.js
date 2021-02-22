@@ -205,8 +205,8 @@ class Graphics extends Excel{
 
 
 
-const proc = new Processors('../assets/css/cpu.xlsx', 0).queryValues(['Brand', 'Model']);
-const grap = new Graphics('../assets/css/gpu.xlsx', 0).queryValues(['Brand', 'Model']);
+const proc = new Processors('../assets/csv/cpu.xlsx', 0).queryValues(['Brand', 'Model']);
+const grap = new Graphics('../assets/csv/gpu.xlsx', 0).queryValues(['Brand', 'Model']);
 
 
 console.log(grap);
