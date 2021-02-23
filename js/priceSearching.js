@@ -17,7 +17,7 @@ function dataSearch(data_json, search_query){
     console.log('Starting to loading the data...');
     
 
-    obj._browser = await puppeteer.launch({headless:true});
+    obj._browser = await puppeteer.launch({headless:false});
     obj._page = await obj._browser.newPage();
   
   
@@ -33,7 +33,7 @@ function dataSearch(data_json, search_query){
     obj.queries = await obj.Utils.jsonReader(data_json); //Parses the path to json and returns a object
 
     await obj._page.goto(obj.queries['mainUrl']+ search_query.replace("-", " ") + "#D" + "[" + search_query.replace("%20", " ") + "]"); //Computes the string query and goes to page
-    await obj._page.waitForSelector(obj.queries['waitFor']); //Waits for the selector mentioned to be loaded
+    await obj._page.waitForSelector(obj.queries['waitFor'], {timeout:10000}); //Waits for the selector mentioned to be loaded
 
     console.log('Page loaded!');
     
@@ -71,8 +71,11 @@ function dataSearch(data_json, search_query){
     let dataAux = {};
     let data = [];
 
+    let counter = 0;
 
     for(var view in views){
+
+      counter += 1
 
       for(var spec in specs_new){
         
@@ -92,6 +95,9 @@ function dataSearch(data_json, search_query){
       data.push(dataAux);
       dataAux = {};
 
+      if(counter == 1){
+        break;
+      }
       
     };
 

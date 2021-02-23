@@ -4,37 +4,40 @@ const priceSearching = require('./priceSearching');
 const searchSpecs = require('./searchSpecs');
 
 
-function handlingSpecs(){
+function handlingSpecs(resolve, reject){
 
-    const obj = {}
+    const obj = {results:{}}
 
     const queries = async ()  => await searchSpecs.proc;
+    obj._queries = queries;
+
 
     const computQueries = async () =>{
 
-        const results = [];
-
-        for(let i of queries){
-    
-            const searched = dataSearch('../jsons/processors.json', i);
+        query = await obj._queries();
+        
+        for(let i of query){
+            
+            console.log(i);
+            const searched = priceSearching.dataSearch('../jsons/mercadoLivre.json', i);
             parsed = await searched.parsingData();
             await searched.closingData();
-
-            results.push()
             
-            console.log({queries:searched.queries, data:searched.data});
-
-    
-            searched = priceSearching.dataSearch('../jsons/mercadoLivre.json', i);
+            obj.results[i] = searched.data[0].price;
+            
+            console.log(obj.results);
         }
+
+
     }
+    obj.computQueries = computQueries;
 
 
-
-
-
+    return obj;
 
 }
 
 
-console.log(searchSpecs);
+
+
+teste = handlingSpecs().computQueries();
