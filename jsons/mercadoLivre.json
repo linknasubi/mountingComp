@@ -2,7 +2,7 @@
 
         "waitFor":"div#ui-search-bottom-ads__wrapper",
         "elemAll": "div.andes-card",
-        "mainUrl": "https://lista.mercadolivre.com.br/computador#D[A:computador]",
+        "mainUrl": "https://lista.mercadolivre.com.br/",
 
 
         "price": ["a.ui-search-result__content > div.ui-search-result__content-wrapper > div.ui-search-item__group > div.ui-search-price ", "innerText"],
